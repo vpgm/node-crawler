@@ -26,7 +26,7 @@
               下载全本
             </mt-button>
             <mt-button type="primary" size="small" @click.native="read()">
-              继续阅读
+              {{ readed ? "继续" : "开始" }}阅读
             </mt-button>
           </div>
         </div>
@@ -77,6 +77,7 @@ export default {
   data() {
     return {
       book_id: this.$route.query.book_id,
+      readed: false,
       showSheet: false,
       actions: [
         {
@@ -220,21 +221,20 @@ export default {
       });
     },
     read() {
-      let novel = getLatestReadChapter(this.book_id);
-      if (!novel) {
+      let readed = this.readed;
+      if (readed) {
+        let has_next = readed.next && readed.next.includes(".html");
+        this.$router.push({
+          path: "/novel/view",
+          query: { chapter_id: has_next ? readed.next : readed.chapter_id }
+        });
+      } else {
+        if (!this.list || !this.list.length) {
+          return this.$toast.fail("未获取倒目录！");
+        }
         this.$router.push({
           path: "/novel/view",
           query: { chapter_id: this.list[0].chapter_id }
-        });
-      } else if (novel.next && novel.next.includes(".html")) {
-        this.$router.push({
-          path: "/novel/view",
-          query: { chapter_id: novel.next }
-        });
-      } else {
-        this.$router.push({
-          path: "/novel/view",
-          query: { chapter_id: novel.chapter_id }
         });
       }
     },
@@ -261,6 +261,7 @@ export default {
     }
   },
   mounted() {
+    this.readed = getLatestReadChapter(this.book_id);
     this.search(this.book_id);
   }
 };
