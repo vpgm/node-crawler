@@ -1,7 +1,12 @@
 <template>
-  <div class="novel-view-wrapper">
+  <div
+    class="novel-view-wrapper"
+    :style="{ backgroundColor: styles.backgroundColor }"
+  >
     <template v-if="loaded">
-      <p class="title" :style="titleStyle">{{ current.chapter_name }}</p>
+      <p class="title" :style="titleStyle">
+        {{ current.chapter_name }}
+      </p>
       <p
         class="content"
         @click="showStylePopup = true"
@@ -352,7 +357,9 @@ export default {
 </script>
 <style lang="less" scoped>
 .novel-view-wrapper {
+  box-sizing: border-box;
   padding: 50px 0 0;
+  min-height: 100vh;
   .title {
     box-sizing: border-box;
     padding: 0 12px;
@@ -362,6 +369,9 @@ export default {
     width: 100vw;
     height: 50px;
     line-height: 50px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .content {
     padding: 0 12px 80px;
