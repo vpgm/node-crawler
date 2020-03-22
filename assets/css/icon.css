@@ -1,0 +1,18 @@
+@font-face {
+  font-family: "mt"; /* project id 1687231 */
+  src: url("//at.alicdn.com/t/font_1687231_w5n4q4vdjps.eot");
+  src: url("//at.alicdn.com/t/font_1687231_w5n4q4vdjps.eot?#iefix")
+      format("embedded-opentype"),
+    url("//at.alicdn.com/t/font_1687231_w5n4q4vdjps.woff2") format("woff2"),
+    url("//at.alicdn.com/t/font_1687231_w5n4q4vdjps.woff") format("woff"),
+    url("//at.alicdn.com/t/font_1687231_w5n4q4vdjps.ttf") format("truetype"),
+    url("//at.alicdn.com/t/font_1687231_w5n4q4vdjps.svg#mt") format("svg");
+}
+
+.mt-icon {
+  font-family: "mt";
+}
+
+.mt-lg {
+  font-size: 1.5em;
+}
