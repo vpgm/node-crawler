@@ -1,0 +1,215 @@
+/* ttf: chrome、firefox、opera、Safari, Android, iOS 4.2+ */
+
+@font-face {
+  font-family: SongTi;
+  src: url("../fonts/宋体.ttf");
+}
+
+@font-face {
+  font-family: KaiTi;
+  src: url("../fonts/楷体.ttf");
+}
+
+@font-face {
+  font-family: HeiTi;
+  src: url("../fonts/黑体.ttf");
+}
+
+@font-face {
+  font-family: FangSong;
+  src: url("../fonts/仿宋.ttf");
+}
+
+@font-face {
+  font-family: YouYuan;
+  src: url("../fonts/幼圆.ttf");
+}
+@font-face {
+  font-family: LiShu;
+  src: url("../fonts/隶书.ttf");
+}
+
+@font-face {
+  font-family: SouJinTi;
+  src: url("../fonts/瘦金体.ttf");
+}
+
+@font-face {
+  font-family: YanTi;
+  src: url("../fonts/田氏颜体字体.ttf");
+}
+
+@font-face {
+  font-family: NokiaTi;
+  src: url("../fonts/诺基亚古印.ttf");
+}
+
+@font-face {
+  font-family: FzCuYuan;
+  src: url("../fonts/方正粗圆.ttf");
+}
+
+@font-face {
+  font-family: FzGuLi;
+  src: url("../fonts/方正古隶.ttf");
+}
+
+@font-face {
+  font-family: FzJingLei;
+  src: url("../fonts/方正静蕾简体.ttf");
+}
+
+@font-face {
+  font-family: FzKaTong;
+  src: url("../fonts/方正卡通简体.ttf");
+}
+
+@font-face {
+  font-family: FzQiTi;
+  src: url("../fonts/方正启体简体.ttf");
+}
+
+@font-face {
+  font-family: FzXiaoZuan;
+  src: url("../fonts/方正小篆.ttf");
+}
+
+@font-face {
+  font-family: FzZhengYuan;
+  src: url("../fonts/方正正圆.ttf");
+}
+
+@font-face {
+  font-family: FzZhunYuan;
+  src: url("../fonts/方正准圆.ttf");
+}
+
+@font-face {
+  font-family: FzYaiTi;
+  src: url("../fonts/方正姚体.ttf");
+}
+
+@font-face {
+  font-family: FzShuTi;
+  src: url("../fonts/方正舒体.ttf");
+}
+
+@font-face {
+  font-family: FzCuHeiSong;
+  src: url("../fonts/方正粗黑宋简体.ttf");
+}
+
+@font-face {
+  font-family: HkWaWaTi;
+  src: url("../fonts/华康娃娃体.ttf");
+}
+
+@font-face {
+  font-family: HwCaiYun;
+  src: url("../fonts/华文彩云.ttf");
+}
+
+@font-face {
+  font-family: HwXingKai;
+  src: url("../fonts/华文行楷.ttf");
+}
+
+@font-face {
+  font-family: HwZhongSong;
+  src: url("../fonts/华文中宋.ttf");
+}
+
+@font-face {
+  font-family: HwXiHei;
+  src: url("../fonts/华文细黑.ttf");
+}
+
+@font-face {
+  font-family: HwSongTi;
+  src: url("../fonts/华文宋体.ttf");
+}
+
+@font-face {
+  font-family: HwLiShu;
+  src: url("../fonts/华文隶书.ttf");
+}
+
+@font-face {
+  font-family: HwKaiTi;
+  src: url("../fonts/华文楷体.ttf");
+}
+
+@font-face {
+  font-family: HwFangSong;
+  src: url("../fonts/华文仿宋.ttf");
+}
+
+@font-face {
+  font-family: DxChangGui;
+  src: url("../fonts/等线常规.ttf");
+}
+
+@font-face {
+  font-family: DxXiTi;
+  src: url("../fonts/等线细体.ttf");
+}
+
+@font-face {
+  font-family: DxCuTi;
+  src: url("../fonts/等线粗体.ttf");
+}
+
+@font-face {
+  font-family: FzYingBiFan;
+  src: url("../fonts/方正硬笔楷书繁.ttf");
+}
+
+@font-face {
+  font-family: FzLanTingFan;
+  src: url("../fonts/方正兰亭超细黑繁体.ttf");
+}
+
+@font-face {
+  font-family: FzKaTongFan;
+  src: url("../fonts/方正卡通繁体.ttf");
+}
+
+@font-face {
+  font-family: FzQiTiFan;
+  src: url("../fonts/方正启体繁体.ttf");
+}
+
+@font-face {
+  font-family: FzLiShuFan;
+  src: url("../fonts/方正隶书繁体.ttf");
+}
+
+@font-face {
+  font-family: FzSongHeiFan;
+  src: url("../fonts/方正宋黑繁体.ttf");
+}
+
+@font-face {
+  font-family: FzZhunYuanFan;
+  src: url("../fonts/方正准圆繁体.ttf");
+}
+
+@font-face {
+  font-family: FzZhongQianFan;
+  src: url("../fonts/方正中倩繁体.ttf");
+}
+
+@font-face {
+  font-family: FzTieJinLiSHuFan;
+  src: url("../fonts/方正铁筋隶书繁体.ttf");
+}
+
+@font-face {
+  font-family: FzSongFan;
+  src: url("../fonts/方正宋繁体.ttf");
+}
+
+@font-face {
+  font-family: FzCuHuoYiFan;
+  src: url("../fonts/方正粗活意繁体.ttf");
+}
