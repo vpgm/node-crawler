@@ -231,10 +231,10 @@ const LINE_HEIGHT_LIB = [
 
 // 字色
 const COLOR_LIB = [
-  "#000",
-  "#333",
-  "#666",
-  "#888",
+  "#000000",
+  "#333333",
+  "#666666",
+  "#888888",
   "#ff0000",
   "#ff2400",
   "#db7093",
@@ -253,10 +253,10 @@ const COLOR_LIB = [
   "#7f00ff",
   "#db70db",
   "#4d4dff",
-  "#ccc",
-  "#ddd",
-  "#eee",
-  "#fff"
+  "#cccccc",
+  "#dddddd",
+  "#eeeeee",
+  "#ffffff"
 ];
 
 // 背景

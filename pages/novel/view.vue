@@ -160,7 +160,7 @@
           style="width:26vw;padding: 10px"
           v-for="item in backgroundColorLib"
           :name="item"
-          :checkedColor="item == '#ffffff' || item == '#fff' ? '#000' : item"
+          :checkedColor="item == '#ffffff' ? '#000' : item"
           :key="item"
           >{{ item }}</van-radio
         >
@@ -173,7 +173,7 @@
           style="width:26vw;padding: 10px"
           v-for="item in colorLib"
           :name="item"
-          :checkedColor="item == '#ffffff' || item == '#fff' ? '#000' : item"
+          :checkedColor="item == '#ffffff' ? '#000' : item"
           :key="item"
           >{{ item }}</van-radio
         >
@@ -232,11 +232,11 @@ export default {
   watch: {
     mode(val) {
       if (val === "sun") {
-        this.styles.backgroundColor = "#fff";
-        this.styles.color = "#000";
+        this.styles.backgroundColor = "#ffffff";
+        this.styles.color = "#000000";
       } else {
-        this.styles.backgroundColor = "#000";
-        this.styles.color = "#fff";
+        this.styles.backgroundColor = "#000000";
+        this.styles.color = "#ffffff";
       }
     },
     styles: {
@@ -360,6 +360,8 @@ export default {
   box-sizing: border-box;
   padding: 50px 0 0;
   min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
   .title {
     box-sizing: border-box;
     padding: 0 12px;
