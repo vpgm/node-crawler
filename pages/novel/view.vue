@@ -304,6 +304,7 @@ export default {
     // 目录
     viewChapterList() {
       this.showChapterPopup = true;
+      if (this.chapters.length) return;
       let book_id = getBookId(this.chapter_id);
       let novel = getVisitNovel(book_id);
       if (novel && novel.list && novel.list.length) {
