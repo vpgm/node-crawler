@@ -38,7 +38,7 @@ const error = {
   success: false
 };
 
-// 失败
+// 超时
 const timeout = {
   status: statusCode.timeout,
   message: message.timeout,
