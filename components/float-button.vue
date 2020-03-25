@@ -3,7 +3,7 @@
     class="float-button-wrapper"
     :style="style"
     v-show="scrollHeight >= visibilityHeight"
-    @click="click($event)"
+    @click="clickBtn($event)"
   >
     <slot>顶部</slot>
   </div>
@@ -46,7 +46,7 @@ export default {
     }
   },
   methods: {
-    click(e) {
+    clickBtn(e) {
       this.$emit("on-click", e);
     }
   },
@@ -69,9 +69,6 @@ export default {
   font-size: 12px;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.12);
   cursor: pointer;
-  z-index: 5;
-  &:hover {
-    background-color: #f2f6fc;
-  }
+  z-index: 99;
 }
 </style>

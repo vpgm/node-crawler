@@ -1,5 +1,5 @@
 // 存储字段
-const READ_BOOK_FONT_FIELD = "read_book_font_field";
+const READ_BOOK_FONT_FIELD = "read_book_font";
 
 // 字体
 const FONT_FAMILY_LIB = [
@@ -361,8 +361,8 @@ const DEFAULT_STYLE = {
   fontFamily: "Microsoft YaHei",
   fontSize: "16px",
   lineHeight: "1.8em",
-  backgroundColor: "#fff",
-  color: "#000"
+  backgroundColor: "#ffffff",
+  color: "#000000"
 };
 
 // 存储阅读样式

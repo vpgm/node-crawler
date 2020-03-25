@@ -1,6 +1,6 @@
 <template>
   <div class="novel-wrapper">
-    <mt-header fixed title="小说">
+    <mt-header fixed title="搜索小说">
       <nuxt-link to="/" slot="left">
         <mt-button icon="back"></mt-button>
       </nuxt-link>

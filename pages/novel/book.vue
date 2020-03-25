@@ -1,7 +1,7 @@
 <template>
   <div class="novel-book-wrapper">
-    <mt-header fixed title="小说">
-      <nuxt-link to="/" slot="left">
+    <mt-header fixed title="书籍详情">
+      <nuxt-link :to="'/novel?name=' + book_info.book_name" slot="left">
         <mt-button icon="back"></mt-button>
       </nuxt-link>
     </mt-header>
@@ -38,9 +38,9 @@
       <div class="chapter">
         <h4>
           <span>目录</span>
-          <span class="order_by blue" @click="change_order_by()">{{
-            order_by === "desc" ? "倒序" : "正序"
-          }}</span>
+          <span class="order_by blue" @click="change_order_by()">
+            {{ order_by === "desc" ? "倒序" : "正序" }}
+          </span>
         </h4>
         <ul>
           <li
@@ -54,7 +54,7 @@
         </ul>
       </div>
     </div>
-    <back-top :right="20" :bottom="20"></back-top>
+    <back-top :size="50" :right="20" :bottom="20"></back-top>
     <van-action-sheet
       v-model="showSheet"
       :actions="actions"
@@ -139,11 +139,7 @@ export default {
         });
     },
     change_order_by() {
-      if (this.order_by === "desc") {
-        this.order_by = "asc";
-      } else {
-        this.order_by = "desc";
-      }
+      this.order_by = ["desc", "asc"].find(item => item !== this.order_by);
     },
     getChapterContent(chapter) {
       let me = this;

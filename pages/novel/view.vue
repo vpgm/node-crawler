@@ -13,15 +13,24 @@
         :style="contentStyle"
         v-html="current.content"
       ></p>
-      <!-- 上一章 目录 下一章 -->
+      <!-- 上一章 封面 目录 下一章 -->
       <float-button
-        :right="160"
+        :right="230"
         :visibility-height="0"
         :size="50"
         :bottom="20"
         @on-click="prevChapter()"
       >
         上一章
+      </float-button>
+      <float-button
+        :right="160"
+        :visibility-height="0"
+        :size="50"
+        :bottom="20"
+        @on-click="viewCover()"
+      >
+        封面
       </float-button>
       <float-button
         :right="90"
@@ -49,11 +58,17 @@
       :style="{ width: '80%', height: '100%' }"
     >
       <div class="chapter-popup-wrapper">
+        <p>
+          <span class="grey">共{{ chapters.length }}章</span>
+          <span class="blue" @click="change_order_by()">
+            {{ order_by === "desc" ? "倒序" : "正序" }}
+          </span>
+        </p>
         <ul>
           <li
-            class="blue"
-            v-for="(item, index) in chapters"
-            :key="index"
+            v-for="item in chapter_list"
+            :class="[item.chapter_id === chapter_id ? 'blue' : '']"
+            :key="item.chapter_id"
             @click="viewChapter(item)"
           >
             {{ item.chapter_name }}
@@ -226,7 +241,8 @@ export default {
       fontFamilyName: "",
       styles: {},
       current: {},
-      chapters: []
+      chapters: [],
+      order_by: "asc" // asc 正序 || desc 倒序
     };
   },
   watch: {
@@ -258,6 +274,10 @@ export default {
     },
     contentStyle() {
       return this.styles;
+    },
+    chapter_list() {
+      let list = JSON.parse(JSON.stringify(this.chapters));
+      return this.order_by === "asc" ? list : list.reverse();
     }
   },
   methods: {
@@ -265,6 +285,7 @@ export default {
     search(chapter_id) {
       this.current = {};
       if (this.$route.query.chapter_id !== chapter_id) {
+        this.chapter_id = chapter_id;
         this.$router.replace({ query: { chapter_id } });
       }
       this.loaded = false;
@@ -301,6 +322,13 @@ export default {
       if (!next_chapter || !next_chapter.includes(".html")) return;
       this.search(next_chapter);
     },
+    // 封面
+    viewCover() {
+      this.$router.push({
+        path: "/novel/book",
+        query: { book_id: getBookId(this.chapter_id) }
+      });
+    },
     // 目录
     viewChapterList() {
       this.showChapterPopup = true;
@@ -325,6 +353,9 @@ export default {
           console.log(err);
           this.$toast.fail("服务器错误");
         });
+    },
+    change_order_by() {
+      this.order_by = ["desc", "asc"].find(item => item !== this.order_by);
     },
     // 阅读章节
     viewChapter(item) {
@@ -377,7 +408,7 @@ export default {
     text-overflow: ellipsis;
   }
   .content {
-    padding: 0 12px 80px;
+    padding: 0 12px 90px;
     text-align: justify;
   }
   .loading-box {
@@ -397,8 +428,13 @@ export default {
   box-sizing: border-box;
   height: 100%;
   overflow: auto;
+  p {
+    display: flex;
+    padding: 15px 15px 10px;
+    justify-content: space-between;
+  }
   ul {
-    padding: 15px;
+    padding: 0 15px 15px;
   }
   li {
     line-height: 2em;

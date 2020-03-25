@@ -24,13 +24,12 @@ function updateVisitNovelRecord(record) {
     throw new Error(`"record" must have "book_id" field.`);
   }
   if (!Array.isArray(record.list)) record.list = [];
-  let flag = records.every((rd, index) => {
-    let bool =
-      rd.list.length !== record.list.length || rd.book_id !== record.book_id;
-    if (!bool) records[index] = record;
-    return bool;
-  });
-  if (flag) records.push(record);
+  let result = records.find(rd => rd.book_id === record.book_id);
+  if (result) {
+    result.list = record.list;
+  } else {
+    records.push(record);
+  }
   localStorage.setItem(VISIT_NOVEL_FIELD, JSON.stringify(records));
 }
 

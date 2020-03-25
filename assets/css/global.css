@@ -18,6 +18,10 @@ html {
   margin: 0;
 }
 
+-webkit-tap-highlight-color {
+  color: transparent;
+}
+
 li {
   list-style: none;
 }
@@ -33,4 +37,16 @@ li {
 .content-wrapper {
   padding: 50px 15px;
   color: #666;
+}
+
+.mint-button {
+  outline: none !important;
+}
+.mint-button:focus {
+  outline: none !important;
+}
+
+input::-moz-focus-inner,
+button::-moz-focus-inner {
+  border: 0;
 }
