@@ -180,7 +180,7 @@
       v-model="showBgColorPopup"
       closeable
       position="bottom"
-      :style="{ maxHeight: '50%' }"
+      :style="{ height: '36%' }"
     >
       <van-radio-group v-model="styles.backgroundColor" direction="horizontal">
         <van-radio
@@ -194,7 +194,12 @@
       </van-radio-group>
     </van-popup>
     <!-- 选择字色弹出层 -->
-    <van-popup v-model="showColorPopup" closeable position="bottom">
+    <van-popup
+      v-model="showColorPopup"
+      :style="{ height: '36%' }"
+      closeable
+      position="bottom"
+    >
       <van-radio-group v-model="styles.color" direction="horizontal">
         <van-radio
           style="width:26vw;padding: 10px"
