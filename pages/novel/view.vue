@@ -1,6 +1,7 @@
 <template>
   <div
     class="novel-view-wrapper"
+    :class="{ 'popup-overlay-visible': showChapterPopup }"
     :style="{ backgroundColor: styles.backgroundColor }"
   >
     <template v-if="loaded">
@@ -94,7 +95,7 @@
           :value="fontFamilyName"
           label="字体"
           placeholder="点击选择字体"
-          @click="showFontFamilyPicker = true"
+          @click="showFontFamilyPopup = true"
         />
         <van-field
           readonly
@@ -103,7 +104,7 @@
           :value="styles.fontSize"
           label="字号"
           placeholder="点击选择字号"
-          @click="showFontSizePicker = true"
+          @click="showFontSizePopup = true"
         />
         <van-field
           readonly
@@ -112,7 +113,7 @@
           :value="styles.lineHeight"
           label="行高"
           placeholder="点击选择行高"
-          @click="showLineHeightPicker = true"
+          @click="showLineHeightPopup = true"
         />
         <van-field
           readonly
@@ -121,7 +122,7 @@
           :value="styles.backgroundColor"
           label="背景"
           placeholder="点击选择背景"
-          @click="showBgColorPicker = true"
+          @click="showBgColorPopup = true"
         />
         <van-field
           readonly
@@ -130,42 +131,42 @@
           :value="styles.color"
           label="字色"
           placeholder="点击选择字色"
-          @click="showColorPicker = true"
+          @click="showColorPopup = true"
         />
       </van-cell-group>
     </van-popup>
     <!-- 选择字体弹出层 -->
-    <van-popup v-model="showFontFamilyPicker" position="bottom">
+    <van-popup v-model="showFontFamilyPopup" position="bottom">
       <van-picker
         show-toolbar
         :columns="fontFamilyLib"
         value-key="name"
         @confirm="onFontFamilyConfirm"
-        @cancel="showFontFamilyPicker = false"
+        @cancel="showFontFamilyPopup = false"
       />
     </van-popup>
     <!-- 选择字号弹出层 -->
-    <van-popup v-model="showFontSizePicker" position="bottom">
+    <van-popup v-model="showFontSizePopup" position="bottom">
       <van-picker
         show-toolbar
         :columns="fontSizeLib"
         @confirm="onFontSizeConfirm"
-        @cancel="showFontSizePicker = false"
+        @cancel="showFontSizePopup = false"
       />
     </van-popup>
     <!-- 选择行高弹出层 -->
-    <van-popup v-model="showLineHeightPicker" position="bottom">
+    <van-popup v-model="showLineHeightPopup" position="bottom">
       <van-picker
         show-toolbar
         :columns="lineHeightLib"
         @confirm="onLineHeightConfirm"
-        @cancel="showLineHeightPicker = false"
+        @cancel="showLineHeightPopup = false"
       >
       </van-picker>
     </van-popup>
     <!-- 选择背景弹出层 -->
     <van-popup
-      v-model="showBgColorPicker"
+      v-model="showBgColorPopup"
       closeable
       position="bottom"
       :style="{ maxHeight: '50%' }"
@@ -182,7 +183,7 @@
       </van-radio-group>
     </van-popup>
     <!-- 选择字色弹出层 -->
-    <van-popup v-model="showColorPicker" closeable position="bottom">
+    <van-popup v-model="showColorPopup" closeable position="bottom">
       <van-radio-group v-model="styles.color" direction="horizontal">
         <van-radio
           style="width:26vw;padding: 10px"
@@ -226,11 +227,11 @@ export default {
       mode: "sun",
       showStylePopup: false,
       showChapterPopup: false,
-      showFontFamilyPicker: false,
-      showFontSizePicker: false,
-      showLineHeightPicker: false,
-      showBgColorPicker: false,
-      showColorPicker: false,
+      showFontFamilyPopup: false,
+      showFontSizePopup: false,
+      showLineHeightPopup: false,
+      showBgColorPopup: false,
+      showColorPopup: false,
       // 样式库
       fontFamilyLib: FONT_FAMILY_LIB,
       fontSizeLib: FONT_SIZE_LIB,
@@ -366,15 +367,15 @@ export default {
     onFontFamilyConfirm(value) {
       this.fontFamilyName = value.name;
       this.styles.fontFamily = value.code;
-      this.showFontFamilyPicker = false;
+      this.showFontFamilyPopup = false;
     },
     onFontSizeConfirm(value) {
       this.styles.fontSize = value;
-      this.showFontSizePicker = false;
+      this.showFontSizePopup = false;
     },
     onLineHeightConfirm(value) {
       this.styles.lineHeight = value;
-      this.showLineHeightPicker = false;
+      this.showLineHeightPopup = false;
     }
   },
   mounted() {

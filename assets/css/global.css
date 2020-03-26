@@ -50,3 +50,7 @@ input::-moz-focus-inner,
 button::-moz-focus-inner {
   border: 0;
 }
+
+.novel-view-wrapper:not(.popup-overlay-visible) .van-overlay {
+  background-color: transparent !important;
+}
