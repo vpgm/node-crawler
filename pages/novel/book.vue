@@ -68,8 +68,8 @@
 <script>
 import { Indicator } from "mint-ui";
 import BackTop from "@/components/back-top.vue";
-import { updateVisitNovelRecord, getLatestReadChapter } from "@/storage/novel";
 import { updateVisitRecord } from "@/storage/record";
+import { updateVisitNovelRecord, getLatestReadChapter } from "@/storage/novel";
 export default {
   components: {
     BackTop
