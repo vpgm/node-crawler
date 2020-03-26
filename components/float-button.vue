@@ -14,6 +14,10 @@
 <script>
 export default {
   props: {
+    recordName: {
+      type: String,
+      default: ""
+    },
     size: {
       type: [String, Number],
       default: "40px"
@@ -88,16 +92,27 @@ export default {
       let pageY = e.touches[0].pageY - document.documentElement.scrollTop;
       let max_right = window.innerWidth - parseFloat(this.size);
       let max_bottom = window.innerHeight - parseFloat(this.size);
+      let new_right = this.touch.pageX - pageX + this.touch.snapshot_right;
+      let new_bottom = this.touch.pageY - pageY + this.touch.snapshot_bottom;
       if (this.moveHorizontal) {
         this.snapshot_right = Math.min(
-          Math.max(this.touch.pageX - pageX + this.touch.snapshot_right, 0),
+          Math.max(parseInt(new_right), 0),
           max_right
         );
       }
       if (this.moveVertical) {
         this.snapshot_bottom = Math.min(
-          Math.max(this.touch.pageY - pageY + this.touch.snapshot_bottom, 0),
+          Math.max(parseInt(new_bottom), 0),
           max_bottom
+        );
+      }
+      if (this.recordName) {
+        localStorage.setItem(
+          this.recordName,
+          JSON.stringify({
+            right: this.snapshot_right,
+            bottom: this.snapshot_bottom
+          })
         );
       }
     },
@@ -106,8 +121,17 @@ export default {
     }
   },
   mounted() {
-    this.snapshot_bottom = this.bottom;
-    this.snapshot_right = this.right;
+    let position;
+    try {
+      position = JSON.parse(localStorage.getItem(this.recordName));
+    } catch (err) {}
+    if (position instanceof Object) {
+      this.snapshot_bottom = position.bottom;
+      this.snapshot_right = position.right;
+    } else {
+      this.snapshot_bottom = this.bottom;
+      this.snapshot_right = this.right;
+    }
     window.addEventListener("scroll", e => {
       this.scrollHeight = document.documentElement.scrollTop;
     });

@@ -17,6 +17,7 @@
     <!-- 上一章 封面 目录 下一章 -->
     <float-button
       v-show="loaded"
+      record-name="btn-prev-chapter"
       :right="230"
       :visibility-height="0"
       :size="50"
@@ -28,6 +29,7 @@
     </float-button>
     <float-button
       v-show="loaded"
+      record-name="btn-book"
       :right="160"
       :visibility-height="0"
       :size="50"
@@ -39,6 +41,7 @@
     </float-button>
     <float-button
       v-show="loaded"
+      record-name="btn-list"
       :right="90"
       :visibility-height="0"
       :size="50"
@@ -50,6 +53,7 @@
     </float-button>
     <float-button
       v-show="loaded"
+      record-name="btn-next-chapter"
       :right="20"
       :visibility-height="0"
       :size="50"
