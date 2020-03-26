@@ -3,7 +3,10 @@
     class="float-button-wrapper"
     :style="style"
     v-show="scrollHeight >= visibilityHeight"
-    @click="clickBtn($event)"
+    @click="clickFn"
+    @touchstart="touchstartFn"
+    @touchmove="touchmoveFn"
+    @touchend="touchendFn"
   >
     <slot>顶部</slot>
   </div>
@@ -26,11 +29,28 @@ export default {
     visibilityHeight: {
       type: Number,
       default: 200
+    },
+    moveHorizontal: {
+      type: Boolean,
+      default: false
+    },
+    moveVertical: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
-      scrollHeight: document.documentElement.scrollTop
+      scrollHeight: document.documentElement.scrollTop,
+      snapshot_bottom: 0,
+      snapshot_right: 0,
+      touch: {
+        flag: false,
+        pageX: 0,
+        pageY: 0,
+        snapshot_bottom: 0,
+        snapshot_right: 0
+      }
     };
   },
   computed: {
@@ -39,18 +59,55 @@ export default {
       return {
         width: size,
         height: size,
-        right: typeof this.right === "number" ? this.right + "px" : this.right,
+        right:
+          typeof this.snapshot_right === "number"
+            ? this.snapshot_right + "px"
+            : this.snapshot_right,
         bottom:
-          typeof this.bottom === "number" ? this.bottom + "px" : this.bottom
+          typeof this.snapshot_bottom === "number"
+            ? this.snapshot_bottom + "px"
+            : this.snapshot_bottom
       };
     }
   },
   methods: {
-    clickBtn(e) {
+    clickFn(e) {
       this.$emit("on-click", e);
+    },
+    touchstartFn(e) {
+      this.touch.flag = true;
+      this.touch.pageX = e.touches[0].pageX;
+      this.touch.pageY = e.touches[0].pageY;
+      this.touch.snapshot_right = this.snapshot_right;
+      this.touch.snapshot_bottom =
+        this.snapshot_bottom - document.documentElement.scrollTop;
+    },
+    touchmoveFn(e) {
+      if (!this.touch.flag) return;
+      let pageX = e.touches[0].pageX;
+      let pageY = e.touches[0].pageY - document.documentElement.scrollTop;
+      let max_right = window.innerWidth - parseFloat(this.size);
+      let max_bottom = window.innerHeight - parseFloat(this.size);
+      if (this.moveHorizontal) {
+        this.snapshot_right = Math.min(
+          Math.max(this.touch.pageX - pageX + this.touch.snapshot_right, 0),
+          max_right
+        );
+      }
+      if (this.moveVertical) {
+        this.snapshot_bottom = Math.min(
+          Math.max(this.touch.pageY - pageY + this.touch.snapshot_bottom, 0),
+          max_bottom
+        );
+      }
+    },
+    touchendFn(e) {
+      this.touch.flag = false;
     }
   },
   mounted() {
+    this.snapshot_bottom = this.bottom;
+    this.snapshot_right = this.right;
     window.addEventListener("scroll", e => {
       this.scrollHeight = document.documentElement.scrollTop;
     });

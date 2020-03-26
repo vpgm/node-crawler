@@ -4,54 +4,61 @@
     :class="{ 'popup-overlay-visible': showChapterPopup }"
     :style="{ backgroundColor: styles.backgroundColor }"
   >
-    <template v-if="loaded">
-      <p class="title" :style="titleStyle">
-        {{ current.chapter_name }}
-      </p>
-      <p
-        class="content"
-        @click="showStylePopup = true"
-        :style="contentStyle"
-        v-html="current.content"
-      ></p>
-      <!-- 上一章 封面 目录 下一章 -->
-      <float-button
-        :right="230"
-        :visibility-height="0"
-        :size="50"
-        :bottom="20"
-        @on-click="prevChapter()"
-      >
-        上一章
-      </float-button>
-      <float-button
-        :right="160"
-        :visibility-height="0"
-        :size="50"
-        :bottom="20"
-        @on-click="viewCover()"
-      >
-        封面
-      </float-button>
-      <float-button
-        :right="90"
-        :visibility-height="0"
-        :size="50"
-        :bottom="20"
-        @on-click="viewChapterList()"
-      >
-        目录
-      </float-button>
-      <float-button
-        :right="20"
-        :visibility-height="0"
-        :size="50"
-        :bottom="20"
-        @on-click="nextChapter()"
-      >
-        下一章
-      </float-button>
-    </template>
+    <p v-show="loaded" class="title" :style="titleStyle">
+      {{ current.chapter_name }}
+    </p>
+    <p
+      v-show="loaded"
+      class="content"
+      @click="showStylePopup = true"
+      :style="contentStyle"
+      v-html="current.content"
+    ></p>
+    <!-- 上一章 封面 目录 下一章 -->
+    <float-button
+      v-show="loaded"
+      :right="230"
+      :visibility-height="0"
+      :size="50"
+      :bottom="20"
+      :move-horizontal="true"
+      @on-click="prevChapter()"
+    >
+      上一章
+    </float-button>
+    <float-button
+      v-show="loaded"
+      :right="160"
+      :visibility-height="0"
+      :size="50"
+      :bottom="20"
+      :move-horizontal="true"
+      @on-click="viewCover()"
+    >
+      封面
+    </float-button>
+    <float-button
+      v-show="loaded"
+      :right="90"
+      :visibility-height="0"
+      :size="50"
+      :bottom="20"
+      :move-horizontal="true"
+      @on-click="viewChapterList()"
+    >
+      目录
+    </float-button>
+    <float-button
+      v-show="loaded"
+      :right="20"
+      :visibility-height="0"
+      :size="50"
+      :bottom="20"
+      :move-horizontal="true"
+      @on-click="nextChapter()"
+    >
+      下一章
+    </float-button>
     <!-- 目录弹出层 -->
     <van-popup
       v-model="showChapterPopup"
