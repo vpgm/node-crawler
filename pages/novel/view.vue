@@ -5,7 +5,12 @@
     :style="{ backgroundColor: styles.backgroundColor }"
   >
     <p v-show="loaded" class="title" :style="titleStyle">
-      {{ current.chapter_name }}
+      <span class="text"
+        >{{ current.chapter_name }}
+      </span>
+      <span class="icon" @click="showOperSheet = true">
+        <van-icon name="ellipsis" />
+      </span>
     </p>
     <p
       v-show="loaded"
@@ -14,11 +19,11 @@
       :style="contentStyle"
       v-html="current.content"
     ></p>
-    <!-- 上一章 封面 目录 下一章 -->
+    <!-- 上一章 目录 下一章 -->
     <float-button
       v-show="loaded"
       record-name="btn-prev-chapter"
-      :right="230"
+      :right="160"
       :visibility-height="0"
       :size="50"
       :bottom="20"
@@ -26,18 +31,6 @@
       @on-click="prevChapter()"
     >
       上一章
-    </float-button>
-    <float-button
-      v-show="loaded"
-      record-name="btn-book"
-      :right="160"
-      :visibility-height="0"
-      :size="50"
-      :bottom="20"
-      :move-horizontal="true"
-      @on-click="viewCover()"
-    >
-      封面
     </float-button>
     <float-button
       v-show="loaded"
@@ -67,7 +60,7 @@
     <van-popup
       v-model="showChapterPopup"
       position="left"
-      :style="{ width: '80%', height: '100%' }"
+      :style="{ width: '75%', height: '100%' }"
     >
       <div class="chapter-popup-wrapper">
         <p>
@@ -180,7 +173,7 @@
       v-model="showBgColorPopup"
       closeable
       position="bottom"
-      :style="{ height: '36%' }"
+      :style="{ height: '264px' }"
     >
       <van-radio-group v-model="styles.backgroundColor" direction="horizontal">
         <van-radio
@@ -196,7 +189,7 @@
     <!-- 选择字色弹出层 -->
     <van-popup
       v-model="showColorPopup"
-      :style="{ height: '36%' }"
+      :style="{ height: '264px' }"
       closeable
       position="bottom"
     >
@@ -211,6 +204,14 @@
         >
       </van-radio-group>
     </van-popup>
+    <!-- action-sheet -->
+    <van-action-sheet
+      v-model="showOperSheet"
+      :actions="actions"
+      @select="onSelect"
+      cancel-text="取消"
+      @cancel="onCancel"
+    />
   </div>
 </template>
 
@@ -248,6 +249,7 @@ export default {
       showLineHeightPopup: false,
       showBgColorPopup: false,
       showColorPopup: false,
+      showOperSheet: false,
       // 样式库
       fontFamilyLib: FONT_FAMILY_LIB,
       fontSizeLib: FONT_SIZE_LIB,
@@ -259,7 +261,21 @@ export default {
       styles: {},
       current: {},
       chapters: [],
-      order_by: "asc" // asc 正序 || desc 倒序
+      order_by: "asc", // asc 正序 || desc 倒序
+      actions: [
+        {
+          name: "前往首页",
+          action: "route_index"
+        },
+        {
+          name: "搜索小说",
+          action: "route_novel"
+        },
+        {
+          name: "回到封面",
+          action: "route_book"
+        }
+      ]
     };
   },
   watch: {
@@ -339,13 +355,6 @@ export default {
       if (!next_chapter || !next_chapter.includes(".html")) return;
       this.search(next_chapter);
     },
-    // 封面
-    viewCover() {
-      this.$router.push({
-        path: "/novel/book",
-        query: { book_id: getBookId(this.chapter_id) }
-      });
-    },
     // 目录
     viewChapterList() {
       this.showChapterPopup = true;
@@ -392,6 +401,23 @@ export default {
     onLineHeightConfirm(value) {
       this.styles.lineHeight = value;
       this.showLineHeightPopup = false;
+    },
+    onSelect(item) {
+      this.showOperSheet = false;
+      switch (item.action) {
+        case "route_index":
+          return this.$router.push("/");
+        case "route_novel":
+          return this.$router.push("/novel");
+        case "route_book":
+          return this.$router.push({
+            path: "/novel/book",
+            query: { book_id: this.current.book_id }
+          });
+      }
+    },
+    onCancel() {
+      this.showOperSheet = false;
     }
   },
   mounted() {
@@ -414,15 +440,32 @@ export default {
   .title {
     box-sizing: border-box;
     padding: 0 12px;
+    display: flex;
+    justify-content: space-between;
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 50px;
     line-height: 50px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    span {
+      display: inline-block;
+    }
+    .text {
+      width: calc(100vw - 74px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .icon {
+      font-size: 1.1em;
+      text-align: right;
+      width: 50px;
+      height: 50px;
+      .van-icon {
+        transform: rotate(90deg);
+      }
+    }
   }
   .content {
     padding: 0 12px 90px;

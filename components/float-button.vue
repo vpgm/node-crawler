@@ -3,10 +3,10 @@
     class="float-button-wrapper"
     :style="style"
     v-show="scrollHeight >= visibilityHeight"
-    @click="clickFn"
-    @touchstart="touchstartFn"
-    @touchmove="touchmoveFn"
-    @touchend="touchendFn"
+    @click.prevent="clickFn"
+    @touchstart.stop="touchstartFn"
+    @touchmove.stop="touchmoveFn"
+    @touchend.stop="touchendFn"
   >
     <slot>顶部</slot>
   </div>
@@ -134,6 +134,7 @@ export default {
     }
     window.addEventListener("scroll", e => {
       this.scrollHeight = document.documentElement.scrollTop;
+      e.preventDefault();
     });
   }
 };
@@ -141,6 +142,7 @@ export default {
 <style lang="less" scoped>
 .float-button-wrapper {
   position: fixed;
+  z-index: 9;
   background-color: #fff;
   border-radius: 50%;
   color: #409eff;
@@ -150,6 +152,6 @@ export default {
   font-size: 12px;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.12);
   cursor: pointer;
-  z-index: 99;
+  user-select: none;
 }
 </style>

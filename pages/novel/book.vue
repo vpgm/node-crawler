@@ -267,7 +267,7 @@ export default {
 .novel-book-wrapper {
   padding-top: 40px;
   .content {
-    padding: 10px 10px;
+    padding: 10px;
     .info {
       display: flex;
       padding-bottom: 5px;

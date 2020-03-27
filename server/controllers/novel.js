@@ -1,5 +1,3 @@
-const fs = require("fs");
-const path = require("path");
 const cheerio = require("cheerio");
 const { success, error, timeout } = require("../response");
 const { extendsFrom, fetch } = require("../util");
@@ -50,7 +48,7 @@ class NovelManager {
         );
       })
       .catch(err => {
-        console.log("findBookList error => ", err);
+        console.log(err);
         res.json(error);
       });
   }
@@ -127,17 +125,23 @@ class NovelManager {
     fetch(`${host}${req.body.chapter_id}`)
       .then(data => {
         let $ = cheerio.load(data);
+        let book = $(".con_top > a").toArray()[2];
+        let book_id = ($(book).attr("href") || "")
+          .split("/")
+          .reverse()
+          .find(href => href);
         let bookname = $(".content_read .bookname");
-
         let result = {
-          content: $("#content").html(),
+          book_id: book_id,
+          book_name: $(book).text(),
           chapter_name: bookname.find("h1").text(),
+          content: $("#content").html(),
           prev: bookname
-            .find(".bottem1 >a")
+            .find(".bottem1 > a")
             .eq(1)
             .attr("href"),
           next: bookname
-            .find(".bottem1 >a")
+            .find(".bottem1 > a")
             .eq(3)
             .attr("href")
         };
