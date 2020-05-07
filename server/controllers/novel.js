@@ -1,6 +1,7 @@
 const cheerio = require("cheerio");
 const { success, error, timeout } = require("../response");
 const { extendsFrom, fetch } = require("../util");
+// https://www.52bqg.com/
 const host = "http://www.tianxiabachang.cn";
 
 class NovelManager {
@@ -148,6 +149,98 @@ class NovelManager {
         res.json(
           extendsFrom(success, {
             data: result
+          })
+        );
+      })
+      .catch(err => {
+        console.log(err);
+        res.json(error);
+      });
+  }
+
+  viewRank(req, res) {
+    fetch(`${host}/paihangbang/`)
+      .then(data => {
+        let $ = cheerio.load(data);
+        let boxList = $("#main > .box").toArray();
+        let list = boxList.map(box => {
+          let $box = $(box);
+          let title = $box.find("h3").text() || "";
+          let lis = $box
+            .find("ul")
+            .first()
+            .find("li")
+            .filter(
+              (i, el) => !($(el).attr("class") || "").match(/ltitle|more/)
+            )
+            .toArray();
+          let books = lis.map(li => {
+            let tag_a = $(li).find("a");
+            return {
+              book_id: (tag_a.attr("href") || "")
+                .replace(host, "")
+                .replace(/\//g, ""),
+              book_name: tag_a.text()
+            };
+          });
+          return {
+            title: title,
+            list: books
+          };
+        });
+        res.json(
+          extendsFrom(success, {
+            data: list
+          })
+        );
+      })
+      .catch(err => {
+        console.log(err);
+        res.json(error);
+      });
+  }
+
+  viewMenu(req, res) {
+    let menu_id = req.body.menu_id;
+    fetch(`${host}/${menu_id}/${req.body.page}`)
+      .then(data => {
+        let $ = cheerio.load(data);
+        let lis = $("#newscontent ul")
+          .first()
+          .find("li")
+          .toArray();
+        let list = lis.map(li => {
+          let tag_a = $(li)
+            .find("span")
+            .first()
+            .find("a");
+          let span = $(li)
+            .find("span")
+            .last();
+          return {
+            book_id: (tag_a.attr("href") || "")
+              .replace(host, "")
+              .replace(/\//g, ""),
+            book_name: tag_a.text(),
+            author: span.text()
+          };
+        });
+        let first = $("#pagelink a.first");
+        let pageInfo = $("#pagestats")
+          .text()
+          .split("/");
+        res.json(
+          extendsFrom(success, {
+            data: {
+              list,
+              page_code: (first.attr("href") || "")
+                .replace(host, "")
+                .replace(menu_id, "")
+                .replace(/\//g, "")
+                .substr(0, 2),
+              page_num: Number(pageInfo[0]),
+              total: Number(pageInfo[1])
+            }
           })
         );
       })

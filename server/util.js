@@ -48,7 +48,11 @@ function fetch(url, options) {
         });
       })
       .on("error", err => {
-        reject(err);
+        fetch(url, options).then(data => {
+          resolve(data);
+        }).catch(err => {
+          reject(err);
+        })
       });
   });
 }

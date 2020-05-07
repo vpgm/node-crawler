@@ -11,5 +11,7 @@ let novelManager = new NovelManager();
 router.post("/findBookList", jsonParser, novelManager.findBookList);
 router.post("/viewBook", jsonParser, novelManager.viewBook);
 router.post("/viewChapter", jsonParser, novelManager.viewChapter);
+router.post("/viewRank", jsonParser, novelManager.viewRank);
+router.post("/viewMenu", jsonParser, novelManager.viewMenu);
 
 module.exports = router;
