@@ -33,7 +33,13 @@ module.exports = {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ["@/plugins/mint-ui.js", "@/plugins/vant.js", "@/plugins/fetch.js", "@/plugins/lazy.js"],
+  plugins: [
+    "@/plugins/mint-ui.js",
+    "@/plugins/vant.js",
+    "@/plugins/event.js",
+    "@/plugins/fetch.js",
+    "@/plugins/lazy.js"
+  ],
   /*
    ** Nuxt.js dev-modules
    */
