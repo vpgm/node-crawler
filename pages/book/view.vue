@@ -1,13 +1,11 @@
 <template>
   <div
-    class="novel-view-wrapper"
+    class="book-view-wrapper"
     :class="{ 'popup-overlay-visible': showChapterPopup }"
     :style="{ backgroundColor: styles.backgroundColor }"
   >
     <p v-show="loaded" class="title" :style="titleStyle">
-      <span class="text"
-        >{{ current.chapter_name }}
-      </span>
+      <span class="text">{{ current.chapter_name }} </span>
       <span class="icon" @click="showOperSheet = true">
         <van-icon name="ellipsis" />
       </span>
@@ -19,11 +17,11 @@
       :style="contentStyle"
       v-html="current.content"
     ></p>
-    <!-- 上一章 目录 下一章 -->
+    <!-- 上一章 目录 听书 下一章 -->
     <float-button
       v-show="loaded"
       record-name="btn-prev-chapter"
-      :right="160"
+      :right="230"
       :visibility-height="0"
       :size="50"
       :bottom="20"
@@ -34,8 +32,8 @@
     </float-button>
     <float-button
       v-show="loaded"
-      record-name="btn-list"
-      :right="90"
+      record-name="btn-chapters"
+      :right="160"
       :visibility-height="0"
       :size="50"
       :bottom="20"
@@ -43,6 +41,21 @@
       @on-click="viewChapterList()"
     >
       目录
+    </float-button>
+    <float-button
+      v-show="loaded"
+      record-name="btn-listen"
+      :right="90"
+      :visibility-height="0"
+      :size="50"
+      :bottom="20"
+      :move-horizontal="true"
+      @on-click="speakAction()"
+    >
+      <span v-show="speakFlag" class="mt-icon" style="font-size: 18px"
+        >&#xe601;</span
+      >
+      {{ speakFlag ? "" : "听书" }}
     </float-button>
     <float-button
       v-show="loaded"
@@ -227,12 +240,9 @@ import {
   setReadStyle,
   getReadStyle
 } from "@/storage/font";
-import {
-  getBookId,
-  updateReadNovelRecord,
-  updateVisitNovelRecord,
-  getVisitNovel
-} from "@/storage/novel";
+import { getBookId, getVisitRecord, updateVisitRecord } from "@/storage/record";
+import TTS from "@/lib/tts.js";
+import Sound from "@/lib/sound.js";
 export default {
   components: {
     FloatButton
@@ -240,7 +250,9 @@ export default {
   data() {
     return {
       chapter_id: this.$route.query.chapter_id,
+      book_id: "",
       loaded: false,
+      speakFlag: false,
       mode: "sun",
       showStylePopup: false,
       showChapterPopup: false,
@@ -326,11 +338,12 @@ export default {
       this.$axios("/viewChapter", { chapter_id })
         .then(res => {
           this.current = res.data || {};
-          updateReadNovelRecord({
-            chapter_id,
-            chapter_name: res.data.chapter_name,
-            prev: res.data.prev,
-            next: res.data.next
+          updateVisitRecord({
+            book_id: this.book_id,
+            curr_chapter: chapter_id,
+            curr_chapter_name: res.data.chapter_name,
+            prev_chapter: res.data.prev,
+            next_chapter: res.data.next
           });
         })
         .catch(err => {
@@ -359,20 +372,19 @@ export default {
     viewChapterList() {
       this.showChapterPopup = true;
       if (this.chapters.length) return;
-      let book_id = getBookId(this.chapter_id);
-      let novel = getVisitNovel(book_id);
-      if (novel && novel.list && novel.list.length) {
-        return (this.chapters = novel.list);
+      let novel = getVisitRecord(this.book_id);
+      if (novel && novel.chapters && novel.chapters.length) {
+        return (this.chapters = novel.chapters);
       }
       this.chapters = [];
       this.$axios("/viewBook", { book_id })
         .then(res => {
           this.chapters = res.data.list || [];
-          updateVisitNovelRecord({
-            book_id,
-            list: res.data.list,
+          updateVisitRecord({
+            book_id: this.book_id,
             book_name: res.data.info.book_name,
-            author: res.data.info.author
+            author: res.data.info.author,
+            chapters: res.data.list
           });
         })
         .catch(err => {
@@ -408,30 +420,128 @@ export default {
         case "route_index":
           return this.$router.push("/");
         case "route_novel":
-          return this.$router.push("/novel");
+          return this.$router.push("/aim");
         case "route_book":
           return this.$router.push({
-            path: "/novel/book",
+            path: "/book/detail",
             query: { book_id: this.current.book_id }
           });
       }
     },
     onCancel() {
       this.showOperSheet = false;
+    },
+    // 听书
+    initSound() {
+      this.sound = new Sound();
+      this.sound.on(
+        "end",
+        () => {
+          this.doSpeak();
+        },
+        this
+      );
+    },
+    speakAction() {
+      this.speakFlag = !this.speakFlag;
+      if (this.speakFlag) {
+        this.nodeIndex = this.getReadNodeIndex() || 0;
+        this.doSpeak();
+      } else {
+        this.cancelSpeak();
+      }
+    },
+    cancelSpeak() {
+      this.sound && this.sound.cancel();
+      this.removeSelection();
+    },
+    doSpeak() {
+      if (!this.speakFlag) return;
+      let node = this.getReadTextNodes()[this.nodeIndex];
+      if (node) {
+        let rect = this.getRangeRect(node);
+        if (rect.top < 0) {
+          document.documentElement.scrollTop -= 50 - rect.top;
+        } else if (rect.top > window.innerHeight * 0.5) {
+          document.documentElement.scrollTop += rect.top - 50;
+        }
+        this.activeSelection(node);
+        this.sound.speak(node.textContent);
+        this.nodeIndex++;
+      } else {
+        this.removeSelection();
+        this.speakFlag = false;
+      }
+    },
+    getReadNodeIndex() {
+      let arr = this.getReadTextNodes();
+      return arr.findIndex((node, index) => {
+        if (document.documentElement.scrollTop === 0 && index === 0) {
+          return true
+        }
+        if (index >=1) {
+          let rect1 = this.getRangeRect(node);
+          let rect2 = this.getRangeRect(arr[index - 1]);
+          if (rect1.top >= 50 && rect2.top < 50) {
+            return true;
+          }
+        }
+      })
+    },
+    // 获取所有文本节点
+    getReadTextNodes() {
+      let content = this.$el.querySelector(".content");
+      let childNodes = Array.from(content.childNodes);
+      return childNodes.filter(node => {
+        let textContent = (node.textContent || "").replace("↵", "").trim();
+        return node.nodeType === 3 && !!textContent;
+      });
+    },
+    // 获取选区边界
+    getRangeRect(node) {
+      let range = this.activeSelection(node).range;
+      let rect = range.getBoundingClientRect().toJSON();
+      this.removeSelection();
+      return rect;
+    },
+    // 激活文本选区
+    activeSelection(node) {
+      let selection = window.getSelection();
+      let range = document.createRange();
+      if (node.nodeType === 3) {
+        range.selectNodeContents(node);
+      } else {
+        range.setStart(node, 0);
+        range.setEnd(node, 0);
+      }
+      selection.removeAllRanges();
+      selection.addRange(range);
+      return { selection, range };
+    },
+    // 移除所有选区
+    removeSelection() {
+      let selection = window.getSelection();
+      selection.removeAllRanges();
     }
   },
   mounted() {
     this.styles = getReadStyle();
+    this.book_id = getBookId(this.chapter_id);
     let family = FONT_FAMILY_LIB.find(
       item => item.code == this.styles.fontFamily
     );
     this.fontFamilyName = family ? family.name : "微软雅黑";
     this.search(this.chapter_id);
+    this.initSound();
+  },
+  destroyed() {
+    Indicator.close();
+    this.cancelSpeak();
   }
 };
 </script>
 <style lang="less" scoped>
-.novel-view-wrapper {
+.book-view-wrapper {
   box-sizing: border-box;
   padding: 50px 0 0;
   min-height: 100vh;
