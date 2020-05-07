@@ -21,41 +21,53 @@ export default {
       nav: "",
       navs: [
         {
-          id: "novel",
-          title: "小说",
-          router: "/novel",
+          id: "",
+          title: "书架",
+          router: "/",
           icon: "&#xe628;"
         },
         {
-          id: "tv",
-          title: "剧集",
-          router: "/tv",
-          icon: "&#xe604;"
+          id: "aim",
+          title: "找书",
+          router: "/aim",
+          icon: "&#xe600;"
         },
         {
-          id: "movie",
-          title: "电影",
-          router: "/movie",
-          icon: "&#xe8ae;"
+          id: "rank",
+          title: "榜单",
+          router: "/rank",
+          icon: "&#xe8a3;"
         },
         {
-          id: "music",
-          title: "音乐",
-          router: "/music",
-          icon: "&#xe609;"
+          id: "menu",
+          title: "分类",
+          router: "/menu",
+          icon: "&#xe652;"
         }
       ]
     };
   },
   watch: {
-    nav(val) {
-      // this.$router.push("/" + val);
-    }
+    nav(val) {}
   },
   methods: {
     goto(item) {
       this.$router.push(item.router);
     }
+  },
+  created() {
+    this.$event.add(
+      "route-change",
+      val => {
+        this.nav = val;
+      },
+      this
+    );
   }
 };
 </script>
+<style lang="less">
+.mint-header-title {
+  overflow: visible !important;
+}
+</style>
