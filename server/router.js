@@ -5,7 +5,7 @@ let bodyParser = require("body-parser");
 let jsonParser = bodyParser.json();
 // 创建 application/x-www-form-urlencoded 解析器
 let urlencodedParser = bodyParser.urlencoded({ extended: false });
-let NovelManager = require("./controllers/novel");
+let NovelManager = require("./controllers/tianxiabachang");
 let novelManager = new NovelManager();
 
 router.post("/findBookList", jsonParser, novelManager.findBookList);

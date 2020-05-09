@@ -1,57 +1,28 @@
 const cheerio = require("cheerio");
-const { success, error, timeout } = require("../response");
-const { extendsFrom, fetch } = require("../util");
-// https://www.52bqg.com/
-const host = "http://www.tianxiabachang.cn";
+const { success, error } = require("../response");
+const { extendsFrom } = require("../util");
+let iconv = require("iconv-lite");
+const request = require("superagent");
+const host = "https://qxs.la";
+// todo: ...
 
 class NovelManager {
   constructor() {}
 
   findBookList(req, res) {
-    fetch(`${host}/cse/search?q=${req.body.name}`)
-      .then(data => {
-        let $ = cheerio.load(data);
-        let novelUl = $(".novelslist2 > ul").first();
-        let bookLis = novelUl
-          .children("li")
-          .toArray()
-          .slice(1);
-        let list = bookLis.map(li => {
-          let spans = $(li)
-            .children("span")
-            .toArray();
-          let tag_a = $(spans[1]).find("a");
-          return {
-            type: $(spans[0])
-              .text()
-              .trim()
-              .replace(/[\[\]]/g, ""),
-            book_name: tag_a.text().trim(),
-            author: $(spans[3])
-              .text()
-              .trim(),
-            book_id: tag_a.attr("href").trim(),
-            status: $(spans[6])
-              .text()
-              .trim(),
-            latest_chapter: $(spans[2])
-              .text()
-              .trim(),
-            latest_time: $(spans[5])
-              .text()
-              .trim()
-          };
-        });
-        res.json(
-          extendsFrom(success, {
-            data: list
-          })
-        );
-      })
-      .catch(err => {
+    request
+    .post(`${host}/s_${encodeURIComponent(req.body.name)}`)
+    .withCredentials()
+    .responseType('arrayBuffer')
+    .then(response => {
+        let data = iconv.decode(Buffer.from(response.body), "gbk");
+        res.json(extendsFrom(success, {
+            html: data
+        }))
+    }).catch(err => {
         console.log(err);
-        res.json(error);
-      });
+        res.json(error)
+    })
   }
 
   viewBook(req, res) {
