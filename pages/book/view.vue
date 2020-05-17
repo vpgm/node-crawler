@@ -377,7 +377,7 @@ export default {
         return (this.chapters = novel.chapters);
       }
       this.chapters = [];
-      this.$axios("/viewBook", { book_id })
+      this.$axios("/viewBook", { book_id: this.book_id })
         .then(res => {
           this.chapters = res.data.list || [];
           updateVisitRecord({
