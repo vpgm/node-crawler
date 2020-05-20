@@ -54,3 +54,7 @@ button::-moz-focus-inner {
 .novel-view-wrapper:not(.popup-overlay-visible) .van-overlay {
   background-color: transparent !important;
 }
+
+.float-button-wrapper.disabled{
+  color: #ccc!important;
+}

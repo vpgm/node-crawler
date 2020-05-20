@@ -123,17 +123,16 @@ export default {
         .then(res => {
           this.book_info = res.data.info || {};
           this.list = res.data.list || [];
+          let first = this.list[0];
+          let last = this.list[this.list.length - 1];
           updateVisitRecord({
             book_id: book_id,
             book_name: res.data.info.book_name,
             author: this.book_info.author,
             image: this.book_info.img,
             latest_time: this.book_info.latest_time,
-            chapters: this.list,
-            latest_chapters: res.data.latest_list || [],
-            curr_chapter: "",
-            prev_chapter: "",
-            next_chapter: ""
+            first_chapter: (first && first.chapter_id) || "",
+            latest_chapter: (last && last.chapter_id) || ""
           });
         })
         .catch(err => {
@@ -230,10 +229,10 @@ export default {
     read() {
       let readed = this.readed;
       if (readed) {
-        let has_next = readed.next && readed.next.includes(".html");
+        let has_next = readed.next_chapter && readed.next_chapter.includes(".html");
         this.$router.push({
           path: "/book/view",
-          query: { chapter_id: has_next ? readed.next : readed.chapter_id }
+          query: { chapter_id: has_next ? readed.next_chapter : readed.curr_chapter }
         });
       } else {
         if (!this.list || !this.list.length) {

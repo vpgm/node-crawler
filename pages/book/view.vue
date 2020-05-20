@@ -20,6 +20,7 @@
     <!-- 上一章 目录 听书 下一章 -->
     <float-button
       v-show="loaded"
+      :class="{ disabled: !current.prev || !current.prev.includes('.html') }"
       record-name="btn-prev-chapter"
       :right="230"
       :visibility-height="0"
@@ -59,6 +60,7 @@
     </float-button>
     <float-button
       v-show="loaded"
+      :class="{ disabled: !current.next || !current.next.includes('.html') }"
       record-name="btn-next-chapter"
       :right="20"
       :visibility-height="0"
@@ -76,22 +78,28 @@
       :style="{ width: '75%', height: '100%' }"
     >
       <div class="chapter-popup-wrapper">
-        <p>
-          <span class="grey">共{{ chapters.length }}章</span>
-          <span class="blue" @click="change_order_by()">
-            {{ order_by === "desc" ? "倒序" : "正序" }}
-          </span>
-        </p>
-        <ul>
-          <li
-            v-for="item in chapter_list"
-            :class="[item.chapter_id === chapter_id ? 'blue' : '']"
-            :key="item.chapter_id"
-            @click="viewChapter(item)"
-          >
-            {{ item.chapter_name }}
-          </li>
-        </ul>
+        <div class="chapter-popup-loading" v-if="chaptersLoading">
+          <van-loading color="#1989fa" :size="40"></van-loading>
+          <p>目录加载中...</p>
+        </div>
+        <template v-else>
+          <p>
+            <span class="grey">共{{ chapters.length }}章</span>
+            <span class="blue" @click="change_order_by()">
+              {{ order_by === "desc" ? "倒序" : "正序" }}
+            </span>
+          </p>
+          <ul>
+            <li
+              v-for="item in chapter_list"
+              :class="[item.chapter_id === chapter_id ? 'blue' : '']"
+              :key="item.chapter_id"
+              @click="viewChapter(item)"
+            >
+              {{ item.chapter_name }}
+            </li>
+          </ul>
+        </template>
       </div>
     </van-popup>
     <!-- 样式设置弹出层 -->
@@ -240,7 +248,7 @@ import {
   setReadStyle,
   getReadStyle
 } from "@/storage/font";
-import { getBookId, getVisitRecord, updateVisitRecord } from "@/storage/record";
+import { getBookId, updateVisitRecord } from "@/storage/record";
 import TTS from "@/lib/tts.js";
 import Sound from "@/lib/sound.js";
 export default {
@@ -252,6 +260,7 @@ export default {
       chapter_id: this.$route.query.chapter_id,
       book_id: "",
       loaded: false,
+      chaptersLoading: false,
       speakFlag: false,
       mode: "sun",
       showStylePopup: false,
@@ -372,24 +381,18 @@ export default {
     viewChapterList() {
       this.showChapterPopup = true;
       if (this.chapters.length) return;
-      let novel = getVisitRecord(this.book_id);
-      if (novel && novel.chapters && novel.chapters.length) {
-        return (this.chapters = novel.chapters);
-      }
       this.chapters = [];
+      this.chaptersLoading = true;
       this.$axios("/viewBook", { book_id: this.book_id })
         .then(res => {
           this.chapters = res.data.list || [];
-          updateVisitRecord({
-            book_id: this.book_id,
-            book_name: res.data.info.book_name,
-            author: res.data.info.author,
-            chapters: res.data.list
-          });
         })
         .catch(err => {
           console.log(err);
           this.$toast.fail("服务器错误");
+        })
+        .finally(() => {
+          this.chaptersLoading = false;
         });
     },
     change_order_by() {
@@ -477,16 +480,16 @@ export default {
       let arr = this.getReadTextNodes();
       return arr.findIndex((node, index) => {
         if (document.documentElement.scrollTop === 0 && index === 0) {
-          return true
+          return true;
         }
-        if (index >=1) {
+        if (index >= 1) {
           let rect1 = this.getRangeRect(node);
           let rect2 = this.getRangeRect(arr[index - 1]);
           if (rect1.top >= 50 && rect2.top < 50) {
             return true;
           }
         }
-      })
+      });
     },
     // 获取所有文本节点
     getReadTextNodes() {
@@ -595,9 +598,28 @@ export default {
   }
 }
 .chapter-popup-wrapper {
+  position: relative;
   box-sizing: border-box;
   height: 100%;
   overflow: auto;
+  .chapter-popup-loading {
+    padding-bottom: 36px;
+    position: absolute;
+    width: max-content;
+    height: max-content;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    p {
+      position: absolute;
+      width: max-content;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #aaa;
+    }
+  }
   p {
     display: flex;
     padding: 15px 15px 10px;

@@ -119,7 +119,7 @@ function resetBooksOnShelf(array_ids = []) {
 
 // 是否已阅读书本
 function isBookReaded(book_id) {
-  return getVisitRecords().some(
+  return getVisitRecords().find(
     item =>
       item.book_id === book_id && (item.curr_chapter + "").endsWith(".html")
   );

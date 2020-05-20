@@ -24,6 +24,7 @@
     </ul>
     <template v-if="!loading">
       <float-button
+        :class="{disabled: pageNum <= 1}"
         record-name="btn-prev-page"
         :right="170"
         :visibility-height="0"
@@ -45,6 +46,7 @@
         {{pageNum}}/{{pageTotal}}
       </float-button>
       <float-button
+        :class="{disabled: pageNum >= pageTotal}"
         record-name="btn-next-page"
         :right="20"
         :visibility-height="0"
