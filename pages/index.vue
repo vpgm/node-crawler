@@ -48,11 +48,7 @@
 
 <script>
 import FloatButton from "@/components/float-button";
-import {
-  getBooksOnShelf,
-  clearVisitRecords,
-  resetBooksOnShelf
-} from "@/storage/record";
+import { getBooksOnShelf, resetBooksOnShelf } from "@/storage/record";
 export default {
   layout: "hbar",
   components: {
@@ -60,6 +56,7 @@ export default {
   },
   data() {
     return {
+      routerFlag: false,
       records: [],
       checkFlag: false,
       li: null,
@@ -94,8 +91,6 @@ export default {
       let chapter_id = "";
       if ((item.curr_chapter + "").endsWith(".html")) {
         chapter_id = item.curr_chapter;
-      } else if (item.chapters && item.chapters.length) {
-        chapter_id = item.chapters[0].chapter_id;
       }
       if (chapter_id) {
         this.$router.push({
@@ -108,6 +103,7 @@ export default {
           query: { book_id: item.book_id }
         });
       }
+      this.routerFlag = true;
     },
     lookupElement(dom, selector = "div") {
       let ret = null;
@@ -171,7 +167,8 @@ export default {
           let index2 = item2.dataIndex;
           return index1 - index2;
         });
-        resetBooksOnShelf(children.map(item => item.book_id));
+        !this.routerFlag &&
+          resetBooksOnShelf(children.map(item => item.book_id));
       }, 300);
     },
     execution() {
