@@ -13,7 +13,7 @@
     <p
       v-show="loaded"
       class="content"
-      @click="showStylePopup = true"
+      @click.prevent="showStylePopup = true"
       :style="contentStyle"
       v-html="current.content"
     ></p>
@@ -249,7 +249,6 @@ import {
   getReadStyle
 } from "@/storage/font";
 import { getBookId, updateVisitRecord } from "@/storage/record";
-import TTS from "@/lib/tts.js";
 import Sound from "@/lib/sound.js";
 export default {
   components: {
@@ -367,12 +366,14 @@ export default {
     },
     // 上一章
     prevChapter() {
+      this.cancelSpeak();
       let prev_chapter = this.current.prev;
       if (!prev_chapter || !prev_chapter.includes(".html")) return;
       this.search(prev_chapter);
     },
     // 下一章
     nextChapter() {
+      this.cancelSpeak();
       let next_chapter = this.current.next;
       if (!next_chapter || !next_chapter.includes(".html")) return;
       this.search(next_chapter);
@@ -444,10 +445,17 @@ export default {
         },
         this
       );
+      this.sound.on(
+        "error",
+        () => {
+          this.doSpeak();
+        },
+        this
+      );
     },
     speakAction() {
-      this.speakFlag = !this.speakFlag;
-      if (this.speakFlag) {
+      if (!this.speakFlag) {
+        this.speakFlag = true;
         this.nodeIndex = this.getReadNodeIndex() || 0;
         this.doSpeak();
       } else {
@@ -455,6 +463,7 @@ export default {
       }
     },
     cancelSpeak() {
+      this.speakFlag = false;
       this.sound && this.sound.cancel();
       this.removeSelection();
     },
