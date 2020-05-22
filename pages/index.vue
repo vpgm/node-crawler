@@ -16,7 +16,7 @@
           @touchmove.stop="touchmoveFn(item, index, $event)"
           @touchend.stop="touchendFn(item, index, $event)"
         >
-          <p><img :src="item.image" /></p>
+          <p class="img" :style="{ backgroundImage: `url(${item.image})` }"></p>
           <span class="blue book-name">{{ item.book_name }}</span>
           <span
             v-show="checkFlag"
@@ -127,7 +127,7 @@ export default {
       this.copyLi.classList.add("book-copy-box");
       this.copyLi.style.left = rect.left + "px";
       this.copyLi.style.top = rect.top + "px";
-      this.copyLi.innerHTML = this.li.querySelector("p").innerHTML;
+      this.copyLi.innerHTML = this.li.querySelector("p.img").outerHTML;
       document.body.appendChild(this.copyLi);
     },
     touchmoveFn(item, index, e) {
@@ -144,7 +144,7 @@ export default {
       this.touch.flag = false;
       this.li.classList.remove("moonlight");
       let rect = this.li
-        .querySelector("img")
+        .querySelector("p.img")
         .getBoundingClientRect()
         .toJSON();
       this.copyLi.style.transition = "all 0.3s ease-in-out";
@@ -208,21 +208,11 @@ export default {
       });
       let lastIndex = includes.length - 1;
       includes.forEach((node, index) => {
-        if (node === this.li) {
-          if (step === 1) {
-            node.style.left = includesRect[0].left + "px";
-            node.style.top = includesRect[0].top + "px";
-            node.dataset.index = includesRect[0].dataIndex;
-          } else {
-            node.style.left = includesRect[lastIndex].left + "px";
-            node.style.top = includesRect[lastIndex].top + "px";
-            node.dataset.index = includesRect[lastIndex].dataIndex;
-          }
-        } else {
-          node.style.left = includesRect[index + step].left + "px";
-          node.style.top = includesRect[index + step].top + "px";
-          node.dataset.index = includesRect[index + step].dataIndex;
-        }
+        let nextIndex =
+          node === this.li ? (step === 1 ? 0 : lastIndex) : index + step;
+        node.style.left = includesRect[nextIndex].left + "px";
+        node.style.top = includesRect[nextIndex].top + "px";
+        node.dataset.index = includesRect[nextIndex].dataIndex;
       });
       this.touch.startIndex = endIndex;
     },
@@ -294,10 +284,11 @@ export default {
         &.transparent {
           opacity: 0;
         }
-        p,
-        img {
+        p.img {
           width: 26vw;
           height: 34vw;
+          background-position: center;
+          background-size: 100% 100%;
         }
         .book-name {
           display: inline-block;
@@ -334,9 +325,11 @@ export default {
   width: 28vw;
   height: 37vw;
   z-index: -1;
-  img {
+  p.img {
     width: 100%;
     height: 100%;
+    background-position: center;
+    background-size: 100% 100%;
   }
 }
 </style>
