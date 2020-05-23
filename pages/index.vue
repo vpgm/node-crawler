@@ -11,7 +11,6 @@
           :key="index"
           :data-index="index"
           :data-bookid="item.book_id"
-          @click.prevent="natigate(item)"
           @touchstart.stop="touchstartFn(item, index, $event)"
           @touchmove.stop="touchmoveFn(item, index, $event)"
           @touchend.stop="touchendFn(item, index, $event)"
@@ -21,7 +20,7 @@
           <span
             v-show="checkFlag"
             class="check-item-icon"
-            @click.stop="item.checked = !item.checked"
+            @touchstart.stop="item.checked = !item.checked"
           >
             <van-icon
               :name="item.checked ? 'passed' : 'circle'"
@@ -63,6 +62,7 @@ export default {
       copyLi: null,
       touch: {
         flag: false,
+        clickMark: 0,
         startIndex: 0,
         endIndex: 0
       }
@@ -117,23 +117,41 @@ export default {
       }
     },
     touchstartFn(item, index, e) {
-      this.touch.flag = true;
+      this.touch.clickMark = 1;
       let target = e.target;
       this.li = this.lookupElement(target, "li");
-      this.li.classList.add("moonlight");
       let rect = this.li.getBoundingClientRect().toJSON();
-      this.touch.startIndex = this.li.dataset.index;
-      this.copyLi = document.createElement("div");
-      this.copyLi.classList.add("book-copy-box");
-      this.copyLi.style.left = rect.left + "px";
-      this.copyLi.style.top = rect.top + "px";
-      this.copyLi.innerHTML = this.li.querySelector("p.img").outerHTML;
-      document.body.appendChild(this.copyLi);
+      let pageX = e.touches[0].pageX;
+      let pageY = e.touches[0].pageY;
+      let center = {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+      };
+      if (
+        (center.x - rect.width / 6 - pageX) *
+          (center.x + rect.width / 6 - pageX) <
+          0 &&
+        (center.y - rect.height / 6 - pageY) *
+          (center.y + rect.height / 6 - pageY) <
+          0
+      ) {
+        this.li.classList.add("moonlight");
+        this.touch.flag = true;
+        this.touch.startIndex = this.li.dataset.index;
+        this.copyLi = document.createElement("div");
+        this.copyLi.classList.add("book-copy-box");
+        this.copyLi.style.left = rect.left + "px";
+        this.copyLi.style.top = rect.top + "px";
+        this.copyLi.innerHTML = this.li.querySelector("p.img").outerHTML;
+        document.body.appendChild(this.copyLi);
+      }
     },
     touchmoveFn(item, index, e) {
+      this.touch.clickMark = 0;
       if (!this.touch.flag) return;
+      e.preventDefault();
       let pageX = e.touches[0].pageX;
-      let pageY = e.touches[0].pageY - document.documentElement.scrollTop;
+      let pageY = e.touches[0].pageY;
       let rect = this.copyLi.getBoundingClientRect().toJSON();
       this.copyLi.style.zIndex = 1;
       this.copyLi.style.left = `${pageX - rect.width / 2}px`;
@@ -141,6 +159,8 @@ export default {
       this.deferredExecution();
     },
     touchendFn(item, index, e) {
+      if (this.touch.clickMark === 1) this.natigate(item);
+      if (!this.touch.flag) return;
       this.touch.flag = false;
       this.li.classList.remove("moonlight");
       let rect = this.li
@@ -202,7 +222,8 @@ export default {
       });
       let includesRect = includes.map(node => {
         let json = node.getBoundingClientRect().toJSON();
-        json.y = json.top = json.top + document.documentElement.scrollTop;
+        json.y = json.top =
+          json.top + document.querySelector(".bookshelf-wrapper").scrollTop;
         json.dataIndex = node.dataset.index;
         return json;
       });
@@ -251,6 +272,9 @@ export default {
     this.$event.fire("route-change", this.$route.path.replace("/", ""));
     this.deferredExecution = this.$lazy(this.execution, 200);
     this.setBooks();
+  },
+  destroyed() {
+    this.copyLi && this.copyLi.remove();
   }
 };
 </script>
@@ -265,12 +289,14 @@ export default {
   background-repeat: no-repeat;
   background-attachment: fixed;
   .bookshelf-wrapper {
-    padding-bottom: 150px;
     width: 100%;
+    height: calc(100vh - 55px);
+    overflow: auto;
     ul {
       position: relative;
       padding-top: 2.75vw;
       padding-left: 2.75vw;
+      margin-bottom: 60px;
       width: 100%;
       overflow: hidden;
       li {
