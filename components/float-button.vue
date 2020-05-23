@@ -88,6 +88,7 @@ export default {
     },
     touchmoveFn(e) {
       if (!this.touch.flag) return;
+      e.preventDefault();
       let pageX = e.touches[0].pageX;
       let pageY = e.touches[0].pageY - document.documentElement.scrollTop;
       let max_right = window.innerWidth - parseFloat(this.size);

@@ -122,7 +122,8 @@ class NovelManager {
   }
 
   viewChapter(req, res) {
-    fetch(`${host}${req.body.chapter_id}`)
+    let chapter_id = req.body.chapter_id;
+    fetch(`${host}${chapter_id}`)
       .then(data => {
         let $ = cheerio.load(data);
         let book = $(".con_top > a").toArray()[2];
@@ -136,6 +137,7 @@ class NovelManager {
           book_name: $(book).text(),
           chapter_name: bookname.find("h1").text(),
           content: $("#content").html(),
+          current: chapter_id,
           prev: bookname
             .find(".bottem1 > a")
             .eq(1)

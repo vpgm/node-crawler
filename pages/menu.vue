@@ -18,7 +18,7 @@
         :key="book.book_id"
         @click="navigate(book)"
       >
-        {{ bIndex + 1 }}.{{ book.book_name }}
+        {{ (pageNum - 1) * pageSize + bIndex + 1 }}.{{ book.book_name }}
         <span style="color:#888"> / {{ book.author }}</span>
       </li>
     </ul>
@@ -100,6 +100,7 @@ export default {
       loading: false,
       page_id: "",
       pageNum: 1,
+      pageSize: 0,
       pageTotal: 1,
       pageCode: "1_",
       list: []
@@ -132,6 +133,7 @@ export default {
           this.pageCode = res.data.page_code;
           this.pageNum = res.data.page_num;
           this.pageTotal = res.data.total;
+          if (!this.pageSize) this.pageSize = this.list.length;
         })
         .catch(err => {
           this.$toast.fail("服务器错误");
