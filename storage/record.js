@@ -1,5 +1,6 @@
 // 存储字段
 const VISIT_FIELD = "visit_record";
+const AIM_FIELD = "aim_record";
 
 // 获取记录
 function getRecords(field) {
@@ -24,7 +25,7 @@ function clearRecords(field) {
 
 // 获取书本book_id
 function getBookId(chapter_id) {
-  return (chapter_id + "").split('/').find(item => item !== "");
+  return (chapter_id + "").split("/").find(item => item !== "");
 }
 
 // 获取所有访问记录
@@ -109,7 +110,9 @@ function removeBooksFromShelf() {
 // 重置书架上的书
 function resetBooksOnShelf(array_ids = []) {
   let records = getVisitRecords();
-  let new_array = array_ids.map(id => records.find(record => record.book_id === id));
+  let new_array = array_ids.map(id =>
+    records.find(record => record.book_id === id)
+  );
   new_array.filter(item => !!item);
   removeBooksFromShelf();
   let new_records = getVisitRecords();
@@ -123,6 +126,23 @@ function isBookReaded(book_id) {
     item =>
       item.book_id === book_id && (item.curr_chapter + "").endsWith(".html")
   );
+}
+
+// 获取搜索记录
+function getAimRecords() {
+  return getRecords(AIM_FIELD);
+}
+
+// 设置搜索记录
+function setAimRecords(records) {
+  setRecords(AIM_FIELD, records);
+}
+
+// 根据书名获取搜索结果
+function getAimBooks(book_name) {
+  let records = getAimRecords();
+  let ret = records.find(rd => rd.book_name === book_name);
+  return ret ? ret.list : null;
 }
 
 export {
@@ -142,5 +162,8 @@ export {
   removeBookFromShelf,
   removeBooksFromShelf,
   resetBooksOnShelf,
-  isBookReaded
+  isBookReaded,
+  getAimRecords,
+  setAimRecords,
+  getAimBooks
 };
