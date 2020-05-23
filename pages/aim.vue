@@ -18,6 +18,7 @@
 
 <script>
 import { Indicator } from "mint-ui";
+import { getAimBooks, setAimRecords } from "@/storage/record";
 export default {
   layout: "hbar",
   data() {
@@ -43,11 +44,21 @@ export default {
         this.$router.replace({ query: { name: val } });
       }
       if (!val) return;
+      let books = getAimBooks(val);
+      if (books) {
+        return (this.list = books);
+      }
       Indicator.open("加载中...");
       this.loading = true;
       this.$axios("/findBookList", { name: val })
         .then(res => {
           this.list = res.data || [];
+          setAimRecords([
+            {
+              book_name: val,
+              list: this.list
+            }
+          ]);
         })
         .catch(err => {
           this.list = [];
@@ -65,12 +76,11 @@ export default {
     }
   },
   mounted() {
-    this.$event.fire("route-change", this.$route.path.replace("/", ""))
+    this.$event.fire("route-change", this.$route.path.replace("/", ""));
     this.searchFn = this.$lazy(this.search, 1000);
     if (this.$route.query.name) {
       this.value = this.$route.query.name;
     }
-
   },
   destroyed() {
     Indicator.close();
