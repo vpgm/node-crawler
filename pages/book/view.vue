@@ -280,6 +280,8 @@ export default {
       fontFamilyName: "",
       styles: {},
       current: {},
+      prev: null,
+      next: null,
       chapters: [],
       order_by: "asc", // asc 正序 || desc 倒序
       actions: [
@@ -336,46 +338,135 @@ export default {
   methods: {
     // 搜索章节内容
     search(chapter_id) {
-      this.current = {};
+      this.loadChapterData(
+        chapter_id,
+        () => {
+          this.current = {};
+          this.updateChapterId(chapter_id);
+          this.loaded = false;
+          Indicator.open("加载中...");
+        },
+        res => {
+          this.current = res.data || {};
+          this.updateVisitRecord();
+          this.loadPrevChapterData(this.current.prev);
+          this.loadNextChapterData(this.current.next);
+        },
+        err => {
+          console.log(err);
+          this.$toast.fail("服务器错误");
+        },
+        () => {
+          this.scrollTop();
+          Indicator.close();
+          this.loaded = true;
+        }
+      );
+    },
+    scrollTop() {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    },
+    getScrollTop() {
+      return document.documentElement.scrollTop || document.body.scrollTop;
+    },
+    setScrollTop(add = 0) {
+      document.body.scrollTop += add;
+      document.documentElement.scrollTop += add;
+    },
+    updateChapterId(chapter_id) {
+      if (!chapter_id) chapter_id = this.current.current;
       if (this.$route.query.chapter_id !== chapter_id) {
         this.chapter_id = chapter_id;
         this.$router.replace({ query: { chapter_id } });
       }
-      this.loaded = false;
-      Indicator.open("加载中...");
+    },
+    updateVisitRecord(chapter_id, data) {
+      if (!data) data = this.current;
+      updateVisitRecord({
+        book_id: this.book_id,
+        curr_chapter: chapter_id || data.current,
+        curr_chapter_name: data.chapter_name,
+        prev_chapter: data.prev,
+        next_chapter: data.next
+      });
+    },
+    loadChapterData(chapter_id, beforeFn, successFn, errorFn, finallyFn) {
+      if (!chapter_id || !chapter_id.match(/\.html$/)) return;
+      this.runFn(beforeFn, chapter_id);
       this.$axios("/viewChapter", { chapter_id })
         .then(res => {
-          this.current = res.data || {};
-          updateVisitRecord({
-            book_id: this.book_id,
-            curr_chapter: chapter_id,
-            curr_chapter_name: res.data.chapter_name,
-            prev_chapter: res.data.prev,
-            next_chapter: res.data.next
-          });
+          this.runFn(successFn, res, chapter_id);
         })
         .catch(err => {
-          console.log(err);
-          this.$toast.fail("服务器错误");
+          this.runFn(errorFn, err, chapter_id);
         })
         .finally(() => {
-          document.documentElement.scrollTop = 0;
-          Indicator.close();
-          this.loaded = true;
+          this.runFn(finallyFn, chapter_id);
         });
+    },
+    loadPrevChapterData(chapter_id) {
+      this.loadChapterData(
+        chapter_id,
+        () => {
+          this.prev = null;
+        },
+        res => {
+          this.prev = res.data || {};
+        }
+      );
+    },
+
+    loadNextChapterData(chapter_id) {
+      this.loadChapterData(
+        chapter_id,
+        () => {
+          this.next = null;
+        },
+        res => {
+          this.next = res.data || {};
+        }
+      );
+    },
+    runFn(fn, ...args) {
+      if (typeof fn === "function") {
+        fn.bind(this)(...args);
+      }
     },
     // 上一章
     prevChapter() {
       this.cancelSpeak();
       let prev_chapter = this.current.prev;
-      if (!prev_chapter || !prev_chapter.includes(".html")) return;
+      if (this.prev) {
+        let prev = JSON.parse(JSON.stringify(this.prev));
+        let current = JSON.parse(JSON.stringify(this.current));
+        this.current = prev;
+        this.next = current;
+        prev_chapter = this.current.prev;
+        this.updateChapterId();
+        this.updateVisitRecord();
+        this.loadPrevChapterData(prev_chapter);
+        this.scrollTop();
+        return false;
+      }
       this.search(prev_chapter);
     },
     // 下一章
     nextChapter() {
       this.cancelSpeak();
       let next_chapter = this.current.next;
-      if (!next_chapter || !next_chapter.includes(".html")) return;
+      if (this.next) {
+        let next = JSON.parse(JSON.stringify(this.next));
+        let current = JSON.parse(JSON.stringify(this.current));
+        this.current = next;
+        this.prev = current;
+        next_chapter = this.current.next;
+        this.updateChapterId();
+        this.updateVisitRecord();
+        this.loadNextChapterData(next_chapter);
+        this.scrollTop();
+        return false;
+      }
       this.search(next_chapter);
     },
     // 目录
@@ -472,10 +563,8 @@ export default {
       let node = this.getReadTextNodes()[this.nodeIndex];
       if (node) {
         let rect = this.getRangeRect(node);
-        if (rect.top < 0) {
-          document.documentElement.scrollTop -= 50 - rect.top;
-        } else if (rect.top > window.innerHeight * 0.5) {
-          document.documentElement.scrollTop += rect.top - 50;
+        if (rect.top < 0 || rect.top > window.innerHeight * 0.5) {
+          this.setScrollTop(rect.top - 50);
         }
         this.activeSelection(node);
         this.sound.speak(node.textContent);
@@ -488,7 +577,7 @@ export default {
     getReadNodeIndex() {
       let arr = this.getReadTextNodes();
       return arr.findIndex((node, index) => {
-        if (document.documentElement.scrollTop === 0 && index === 0) {
+        if (this.getScrollTop() === 0 && index === 0) {
           return true;
         }
         if (index >= 1) {
@@ -506,7 +595,7 @@ export default {
       let childNodes = Array.from(content.childNodes);
       return childNodes.filter(node => {
         let textContent = (node.textContent || "").replace("↵", "").trim();
-        return node.nodeType === 3 && !!textContent;
+        return node.nodeType === 3 && !!textContent && textContent.match(/[a-z\d\u4e00-\u9fa5]/i);
       });
     },
     // 获取选区边界
