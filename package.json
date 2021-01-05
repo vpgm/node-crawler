@@ -12,7 +12,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "cross-env": "^5.2.0",
     "express": "^4.16.4",
     "mint-ui": "^2.2.13",
